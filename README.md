@@ -95,15 +95,16 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
         with tf.GradientTape(watch_accessed_variables=False,persistent=True) as tape:
             tape.watch(ADJ_MATS)
         pred_exp = get_pred(ADJ_MATS,NUM_RELATIONS,tape,pred,head,tail,TOP_K)
-
-        gradient_score = tape.gradient(pred, adj_mat_i.values)
-        p_logic = weight_calulate.logic_weight(head, tail, pred)
-        p_rele = weight_calulate.relevent_weight(head, adj_mat_i.indices[a[0], 2]) 
-
-        # The score of the contribution of the relevant edge to the predicted outcome of the interpreted edge   
-        score = math.exp(np.sign(pred.numpy())*(p_logic+p_rele))*gradient_score[a][0]
-
-
+        for i in range(num_relations):
+            gradient_score = tape.gradient(pred, adj_mat_i.values)
+            p_logic = weight_calulate.logic_weight(head, tail, pred)
+            p_rele = weight_calulate.relevent_weight(head, adj_mat_i.indices[a[0], 2]) 
+    
+            # The score of the contribution of the relevant edge to the predicted outcome of the interpreted edge   
+            score = math.exp(np.sign(pred.numpy())*(p_logic+p_rele))*gradient_score[a][0]
+            scores.append(score)
+        score_dic = dict(zip(relat, scores))
+        top_k_scores = sorted(score_dic.items(), key=lambda x : x[1],reverse=True)[:top_k]
 
 ```
 
