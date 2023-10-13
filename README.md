@@ -26,12 +26,17 @@ Secondly, we tackle the crucial challenge of interpreting these predictions. We 
 Furthermore, we evaluate the quality and effectiveness of our interpretation methodology, ensuring that our research doesn't just stop at prediction but extends into the realm of actionable insights. In doing so, we aim to bridge the gap between predictive analytics and practical, real-world applications in the context of drug response prediction.
 
 
-# Quickstart
+# Quick start
 ## Cell line-Drug Prediction
  ```python
     #!/usr/bin/env python3
     import tensorflow as tf\
     import RGCN
+
+    #input
+    train_triples = np.load('../data/train_triples.npy')
+    test_triples = np.load('../data/test_triples.npy')
+    entities = np.load(r'../data/entities.npy')
 
     model = get_RGCN_Model(
         num_entities=NUM_ENTITIES,
@@ -41,20 +46,32 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
         seed=SEED
     )
 
-    model.compile(
-        loss=tf.keras.losses.BinaryCrossentropy(),
-        optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
+   # model training
+    model.fit(
+        x=[
+            ALL_INDICES,
+            X_train_triples[:,:,0],
+            X_train_triples[:,:,1],
+            X_train_triples[:,:,2],
+            ADJ_MATS
+        ],
+        y=X_train_triples[:,:, 1].reshape(1, -1),
+        epochs=NUM_EPOCHS,
+        batch_size=1,
+        verbose=1
     )
-
-    ALL_INDICES = tf.reshape(tf.range(0,NUM_ENTITIES,1,dtype=tf.int64), (1,-1))
-    pred = model([
-                ALL_INDICES,
-                tf.reshape(head,(1,-1)),
-                tf.reshape(rel,(1,-1)),
-                tf.reshape(tail,(1,-1)),
-                ADJ_MATS
-                ]
-            )
+   # output
+   for head, rel, tail, true_exp in tf_data:
+        pred = model([
+            ALL_INDICES,
+            tf.reshape(head, (1, -1)),
+            tf.reshape(rel, (1, -1)),
+            tf.reshape(tail, (1, -1)),
+            ADJ_MATS
+        ]
+        )
+        pred_list.append([head, pred, rel, tail)
+   
 ```
 
 
@@ -68,18 +85,23 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
     # representations that capture logical and semantic relationships within data.
     weight_calulate = weight_utils.Weight_Cal()
 
-        for head, rel, tail , true_exp in tf_data:
-            # Tensors can be manually watched by invoking the watch method on this context manager.
-            with tf.GradientTape(watch_accessed_variables=False,persistent=True) as tape:
-                tape.watch(ADJ_MATS)
-            pred_exp = get_pred(ADJ_MATS,NUM_RELATIONS,tape,pred,head,tail,TOP_K)
+    #input
+    train_triples = np.load('../data/train_triples.npy')
+    test_triples = np.load('../data/test_triples.npy')
+    entities = np.load(r'../data/entities.npy')
 
-            gradient_score = tape.gradient(pred, adj_mat_i.values)
-            p_logic = weight_calulate.logic_weight(head, tail, pred)
-            p_rele = weight_calulate.relevent_weight(head, adj_mat_i.indices[a[0], 2]) 
+    for head, rel, tail , true_exp in tf_data:
+        # Tensors can be manually watched by invoking the watch method on this context manager.
+        with tf.GradientTape(watch_accessed_variables=False,persistent=True) as tape:
+            tape.watch(ADJ_MATS)
+        pred_exp = get_pred(ADJ_MATS,NUM_RELATIONS,tape,pred,head,tail,TOP_K)
 
-            # The score of the contribution of the relevant edge to the predicted outcome of the interpreted edge   
-            score = math.exp(np.sign(pred.numpy())*(p_logic+p_rele))*gradient_score[a][0]
+        gradient_score = tape.gradient(pred, adj_mat_i.values)
+        p_logic = weight_calulate.logic_weight(head, tail, pred)
+        p_rele = weight_calulate.relevent_weight(head, adj_mat_i.indices[a[0], 2]) 
+
+        # The score of the contribution of the relevant edge to the predicted outcome of the interpreted edge   
+        score = math.exp(np.sign(pred.numpy())*(p_logic+p_rele))*gradient_score[a][0]
 
 
 
