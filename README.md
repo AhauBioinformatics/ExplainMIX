@@ -30,7 +30,7 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
 ## Cell line-Drug Prediction
  ```python
     #!/usr/bin/env python3
-    import tensorflow as tf\
+    import tensorflow as tf
     import RGCN
 
     #input
@@ -60,6 +60,7 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
         batch_size=1,
         verbose=1
     )
+
    # output
    for head, rel, tail, true_exp in tf_data:
         pred = model([
@@ -85,7 +86,6 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
     # representations that capture logical and semantic relationships within data.
     weight_calulate = weight_utils.Weight_Cal()
 
-    #input
     train_triples = np.load('../data/train_triples.npy')
     test_triples = np.load('../data/test_triples.npy')
     entities = np.load(r'../data/entities.npy')
