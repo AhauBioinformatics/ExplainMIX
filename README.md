@@ -111,7 +111,7 @@ Furthermore, we evaluate the quality and effectiveness of our interpretation met
 ```
 
 # Citation
-Ying Xiang, Xiaosong Wang, Qian Gao and Zhenyu Yue*, ExplainMIX: Exploring Drug Response with Explainable Multi-Omics Fusion in Heterogeneous Graph Neural Networks, 2023, Submitted.
+Ying Xiang,Hangcheng Liu, Xiaosong Wang, Wanling Gao,Qian Gao and Zhenyu Yue*, ExplainMIX: Exploring Drug Response with Explainable Multi-Omics Fusion in Heterogeneous Graph Neural Networks, 2024, Submitted.
 
 # Contact
 Please feel free to contact us if you need any help: zhenyuyue@ahau.edu.cn
