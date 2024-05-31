@@ -26,6 +26,8 @@ Secondly, we tackle the crucial challenge of interpreting these predictions. We 
 Furthermore, we evaluate the quality and effectiveness of our interpretation methodology, ensuring that our research doesn't just stop at prediction but extends into the realm of actionable insights. In doing so, we aim to bridge the gap between predictive analytics and practical, real-world applications in the context of drug response prediction.
 
 ## How to use our model
+Our main model file is ExplainMIX_main.py, we just need to run this file to use our model
+
 
 # Quick start
 ## Cell line-Drug Prediction
